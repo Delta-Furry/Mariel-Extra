@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de la Serie de Taylor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 10px;
+      line-height: 1.5;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, button {
+      margin: 5px 0;
+      padding: 5px;
+      font-size: 1em;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #resultado {
+      margin-top: 15px;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Calculadora de la Serie de Taylor</h1>
+  <!-- Campos de entrada para función, punto base, valor x y número de términos -->
+  <label for="func">Función f(x):</label>
+  <input id="func" type="text" placeholder="Por ejemplo: e^(-x), sin(x), ln(x)" value="sin(x)">
+
+  <label for="a">Punto base (a):</label>
+  <input id="a" type="number" placeholder="Valor de a (centro de la serie)" value="0">
+
+  <label for="x">Valor de x:</label>
+  <input id="x" type="number" placeholder="Valor donde evaluar" value="1">
+
+  <label for="n">Número de términos (n):</label>
+  <input id="n" type="number" placeholder="Cantidad de términos (entero >=0)" value="5">
+
+  <!-- Botón para calcular -->
+  <button onclick="calcularTaylor()">Calcular</button>
+
+  <!-- Área donde se mostrarán los resultados -->
+  <div id="resultado">
+    <p id="aproximado"></p>
+    <p id="real"></p>
+    <p id="error"></p>
+  </div>
+
+  <script>
+    // Función factorial recursiva para calcular n!:contentReference[oaicite:9]{index=9}
+    function factorial(num) {
+      if (num === 0) {
+        return 1;
+      } else {
+        return num * factorial(num - 1);
+      }
+    }
+
+    // Función para aproximar la k-ésima derivada de f en a usando diferencias finitas
+    function derivada(f, a, orden) {
+      var h = 1e-4; // paso pequeño para diferencia central
+      if (orden === 0) {
+        return f(a); // derivada de orden 0 es la función misma
+      }
+      if (orden === 1) {
+        // Derivada primera por diferencia central
+        return (f(a + h) - f(a - h)) / (2 * h);
+      }
+      // Derivada de orden >=2 recursiva:
+      return (derivada(f, a + h, orden - 1) - derivada(f, a - h, orden - 1)) / (2 * h);
+    }
+
+    // Función que se ejecuta al hacer clic en "Calcular"
+    function calcularTaylor() {
+      // Obtener valores ingresados por el usuario
+      var expr = document.getElementById("func").value;
+      var a = parseFloat(document.getElementById("a").value);
+      var x = parseFloat(document.getElementById("x").value);
+      var n = parseInt(document.getElementById("n").value);
+
+      // Reemplazar algunas funciones y operadores para que sean válidos en JS
+      expr = expr.replace(/sin/g, "Math.sin");
+      expr = expr.replace(/cos/g, "Math.cos");
+      expr = expr.replace(/tan/g, "Math.tan");
+      expr = expr.replace(/ln/g, "Math.log");
+      expr = expr.replace(/exp\(/g, "Math.exp(");
+      expr = expr.replace(/e\^\(/g, "Math.E**("); // e^(...) -> Math.E**(...)
+      expr = expr.replace(/\^/g, "**");          // '^' a '**' para exponentes
+
+      // Crear la función f(x) a partir de la expresión procesada
+      var f;
+      try {
+        f = new Function('x', 'return ' + expr + ';');
+      } catch (err) {
+        alert("Error en la función ingresada.");
+        return;
+      }
+
+      // Calcular la serie de Taylor sumando términos desde k=0 hasta k=n
+      var sum = 0;
+      for (var k = 0; k <= n; k++) {
+        // Calcular la k-ésima derivada en el punto a y dividir por k!
+        var deriv = derivada(f, a, k);
+        var coef = deriv / factorial(k);
+        // Añadir el término coef * (x-a)^k a la suma
+        sum += coef * Math.pow((x - a), k);
+      }
+
+      // Mostrar el valor aproximado
+      document.getElementById("aproximado").textContent = 
+        "Valor aproximado (serie de Taylor): " + sum;
+
+      // Calcular valor real y error si es posible
+      var mostrarReal = "";
+      try {
+        var real = f(x);
+        if (isFinite(real)) {
+          var error = Math.abs(real - sum);
+          mostrarReal += "Valor real f(x): " + real.toString();
+          document.getElementById("real").textContent = mostrarReal;
+          document.getElementById("error").textContent = "Error absoluto: " + error;
+        } else {
+          document.getElementById("real").textContent = "";
+          document.getElementById("error").textContent = "";
+        }
+      } catch (err) {
+        // Si la evaluación directa falla (p. ej. ln de negativo), no mostrar
+        document.getElementById("real").textContent = "";
+        document.getElementById("error").textContent = "";
+      }
+    }
+  </script>
+</body>
+</html>
