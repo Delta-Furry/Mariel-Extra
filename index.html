@@ -2,122 +2,145 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Calculadora de la Serie de Taylor</title>
+  <title>Calculadora de Gauss - UNEVE ICM</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 10px;
-      line-height: 1.5;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    label {
-      display: block;
-      margin-top: 10px;
+    h1 {
+      color: #0d47a1;
+    }
+    h2 {
+      font-size: 1.2em;
+      margin-top: -10px;
+      color: #555;
+    }
+    .ecuacion {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .ecuacion label {
+      grid-column: span 4;
       font-weight: bold;
     }
-    input, button {
-      margin: 5px 0;
-      padding: 5px;
+    .ecuacion input {
+      padding: 8px;
       font-size: 1em;
-      width: 100%;
-      box-sizing: border-box;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .ecuacion .titulo {
+      text-align: center;
+      font-size: 0.9em;
+      font-style: italic;
+      color: #333;
     }
     button {
-      background-color: #4CAF50;
+      background-color: #0d47a1;
       color: white;
       border: none;
+      padding: 12px;
+      font-size: 1.1em;
+      width: 100%;
       cursor: pointer;
+      border-radius: 6px;
+      margin-top: 10px;
     }
     button:hover {
-      background-color: #45a049;
+      background-color: #1565c0;
     }
     #resultado {
-      margin-top: 15px;
-      padding: 10px;
-      border-top: 1px solid #ccc;
+      margin-top: 20px;
+      padding: 15px;
+      border-top: 2px solid #0d47a1;
+      background-color: #e3f2fd;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
-  <h1>Calculadora de la Serie de Taylor</h1>
-  <p>Esta herramienta sirve para aproximar funciones usando la serie de Taylor.</p>
-  <p>Por la alumna Rodrigues Cruz Mariel Alejandra (osea yo XD).</p>
+  <h1>Calculadora por Método de Gauss</h1>
+  <h2>Proyecto de Mariel Alejandra Rodríguez Cruz - UNEVE / ICM</h2>
+  <p>Introduce cada uno de los coeficientes del sistema de 3 ecuaciones lineales con 3 incógnitas. El programa calculará automáticamente los valores de <strong>x</strong>, <strong>y</strong> y <strong>z</strong>.</p>
 
-  <label for="funcion">Función f(x):</label>
-  <input id="funcion" type="text" placeholder="Ej: 10*e^(-x)" value="10*e^(-x)">
-
-  <label for="a">Punto base (a):</label>
-  <input id="a" type="number" value="2">
-
-  <label for="x">Valor a evaluar (x):</label>
-  <input id="x" type="number" value="4">
-
-  <label for="n">Número de términos:</label>
-  <input id="n" type="number" value="3">
-
-  <button onclick="calcularTaylor()">Calcular aproximación</button>
-
-  <div id="resultado">
-    <p id="aproximado"></p>
-    <p id="real"></p>
-    <p id="error"></p>
+  <div class="ecuacion">
+    <label>Ecuación 1: 3x + 4y + 9z = 23</label>
+    <div class="titulo">Coeficiente de x</div>
+    <div class="titulo">Coeficiente de y</div>
+    <div class="titulo">Coeficiente de z</div>
+    <div class="titulo">Resultado</div>
+    <input id="a1" type="number" value="3">
+    <input id="b1" type="number" value="4">
+    <input id="c1" type="number" value="9">
+    <input id="d1" type="number" value="23">
   </div>
 
+  <div class="ecuacion">
+    <label>Ecuación 2: 2x + 5y + 7z = 19</label>
+    <div class="titulo">Coeficiente de x</div>
+    <div class="titulo">Coeficiente de y</div>
+    <div class="titulo">Coeficiente de z</div>
+    <div class="titulo">Resultado</div>
+    <input id="a2" type="number" value="2">
+    <input id="b2" type="number" value="5">
+    <input id="c2" type="number" value="7">
+    <input id="d2" type="number" value="19">
+  </div>
+
+  <div class="ecuacion">
+    <label>Ecuación 3: 1x + 2y + 3z = 10</label>
+    <div class="titulo">Coeficiente de x</div>
+    <div class="titulo">Coeficiente de y</div>
+    <div class="titulo">Coeficiente de z</div>
+    <div class="titulo">Resultado</div>
+    <input id="a3" type="number" value="1">
+    <input id="b3" type="number" value="2">
+    <input id="c3" type="number" value="3">
+    <input id="d3" type="number" value="10">
+  </div>
+
+  <button onclick="resolverGauss()">Resolver sistema</button>
+
+  <div id="resultado"></div>
+
   <script>
-    // Función para calcular el factorial
-    function factorial(n) {
-      if (n === 0) return 1;
-      return n * factorial(n - 1);
-    }
+    function resolverGauss() {
+      var A = [
+        [parseFloat(document.getElementById("a1").value), parseFloat(document.getElementById("b1").value), parseFloat(document.getElementById("c1").value), parseFloat(document.getElementById("d1").value)],
+        [parseFloat(document.getElementById("a2").value), parseFloat(document.getElementById("b2").value), parseFloat(document.getElementById("c2").value), parseFloat(document.getElementById("d2").value)],
+        [parseFloat(document.getElementById("a3").value), parseFloat(document.getElementById("b3").value), parseFloat(document.getElementById("c3").value), parseFloat(document.getElementById("d3").value)]
+      ];
 
-    // Función para derivar de forma numérica
-    function derivada(f, x, orden) {
-      var h = 0.0001;
-      if (orden === 0) return f(x);
-      if (orden === 1) return (f(x + h) - f(x - h)) / (2 * h);
-      return (derivada(f, x + h, orden - 1) - derivada(f, x - h, orden - 1)) / (2 * h);
-    }
-
-    // Función principal que calcula la serie de Taylor
-    function calcularTaylor() {
-      var expr = document.getElementById("funcion").value;
-      var a = parseFloat(document.getElementById("a").value);
-      var x = parseFloat(document.getElementById("x").value);
-      var n = parseInt(document.getElementById("n").value);
-
-      // Reemplazos para que funcione en JavaScript
-      expr = expr.replace(/e\^\(-?x\)/g, "Math.exp(-x)");
-      expr = expr.replace(/sin/g, "Math.sin");
-      expr = expr.replace(/cos/g, "Math.cos");
-      expr = expr.replace(/ln/g, "Math.log");
-      expr = expr.replace(/\^/g, "**");
-
-      try {
-        var f = new Function("x", "return " + expr + ";");
-      } catch (error) {
-        alert("Error en la función. Asegúrate que esté bien escrita.");
-        return;
+      for (var i = 0; i < 3; i++) {
+        var divisor = A[i][i];
+        for (var j = i; j < 4; j++) {
+          A[i][j] = A[i][j] / divisor;
+        }
+        for (var k = i + 1; k < 3; k++) {
+          var factor = A[k][i];
+          for (var j = i; j < 4; j++) {
+            A[k][j] = A[k][j] - factor * A[i][j];
+          }
+        }
       }
 
-      var suma = 0;
-      for (var k = 0; k <= n; k++) {
-        var deriv = derivada(f, a, k);
-        var termino = deriv / factorial(k) * Math.pow(x - a, k);
-        suma += termino;
-      }
+      var z = A[2][3];
+      var y = A[1][3] - A[1][2] * z;
+      var x = A[0][3] - A[0][2] * z - A[0][1] * y;
 
-      document.getElementById("aproximado").textContent = "Valor aproximado usando la serie de Taylor: " + suma.toFixed(6);
-
-      try {
-        var real = f(x);
-        var error = Math.abs(real - suma);
-        document.getElementById("real").textContent = "Valor real f(x): " + real.toFixed(6);
-        document.getElementById("error").textContent = "Error absoluto: " + error.toFixed(6);
-      } catch (error) {
-        document.getElementById("real").textContent = "No se pudo evaluar el valor real.";
-        document.getElementById("error").textContent = "";
-      }
+      document.getElementById("resultado").innerHTML =
+        "<p><strong>Resultado del sistema:</strong></p>" +
+        "<p>x = " + x.toFixed(4) + ", y = " + y.toFixed(4) + ", z = " + z.toFixed(4) + "</p>";
     }
   </script>
 </body>
